@@ -26,11 +26,11 @@ function unityShowBanner(msg, type) {
 }
 
 var buildUrl = "Build";
-var loaderUrl = buildUrl + "/IA2.loader.js";
+var loaderUrl = buildUrl + "/IA 3.loader.js";
 var config = {
-    dataUrl: buildUrl + "/IA2.data",
-    frameworkUrl: buildUrl + "/IA2.framework.js",
-    codeUrl: buildUrl + "/IA2.wasm",
+    dataUrl: buildUrl + "/IA 3.data",
+    frameworkUrl: buildUrl + "/IA 3.framework.js",
+    codeUrl: buildUrl + "/IA 3.wasm",
     streamingAssetsUrl: "StreamingAssets",
     companyName: "INNOVATECHVR",
     productName: "IASST",
