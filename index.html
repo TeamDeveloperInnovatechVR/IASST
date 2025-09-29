@@ -50,8 +50,8 @@
     .doc-section{display:flex;gap:10px;align-items:center;}
     .progress-bar{width:100%;height:14px;background:#333;border-radius:7px;overflow:hidden;}
     .progress{height:100%;width:0;background:var(--accent);transition:width 0.3s;}
-    .doc-controls{display:none;flex-direction:column;gap:10px;}
-    .doc-controls input{padding:12px;border-radius:10px;border:none;font-size:14px;background:#fff;color:#000;} /* texto negro */
+    .doc-controls{display:flex;flex-direction:column;gap:10px;} /* habilitado por defecto */
+    .doc-controls input{padding:12px;border-radius:10px;border:none;font-size:14px;background:#fff;color:#000;}
     .doc-controls button{background:var(--accent);border:none;color:var(--deep);padding:12px 20px;border-radius:10px;font-weight:bold;cursor:pointer;}
     #statusText{padding:8px;text-align:center;font-size:13px;color:#ccc;}
   </style>
@@ -111,7 +111,6 @@ const toggle=document.getElementById('modeToggle');
 const chatComposer=document.getElementById('chatComposer');
 const docUploader=document.getElementById('docUploader');
 const progressBar=document.getElementById('progress');
-const docControls=document.getElementById('docControls');
 const messages=document.getElementById('messages');
 const sendBtn=document.getElementById('send');
 const input=document.getElementById('input');
@@ -137,8 +136,10 @@ async function loadFirebaseKeys(){
     ASSISTANT_ID=data.KeyAssit;
     statusText.textContent="✅ Configuración lista. Pregunta lo que quieras.";
     input.disabled=false; sendBtn.disabled=false;
+    console.log("⚙️ Configuración cargada:",data);
   }catch(e){
     statusText.textContent="❌ Error al cargar configuración";
+    console.error("❌ Error al cargar Firebase:",e);
   }
 }
 
@@ -146,6 +147,7 @@ async function loadFirebaseKeys(){
 // THREAD
 // =========================
 async function createThread(){
+  console.log("🧵 Creando nuevo thread...");
   const res=await fetch("https://api.openai.com/v1/threads",{
     method:"POST",
     headers:{
@@ -157,6 +159,7 @@ async function createThread(){
   });
   const data=await res.json();
   currentThreadId=data.id;
+  console.log("✅ Thread creado:",currentThreadId);
 }
 
 // =========================
@@ -169,6 +172,7 @@ async function askAssistant(question){
     input.disabled=true; sendBtn.disabled=true;
     statusText.textContent="⏳ Preguntando a IASST...";
     appendMessage(question,'user');
+    console.log("📤 Enviando pregunta:",question);
 
     // enviar mensaje
     await fetch(`https://api.openai.com/v1/threads/${currentThreadId}/messages`,{
@@ -180,6 +184,7 @@ async function askAssistant(question){
       },
       body:JSON.stringify({role:"user",content:[{type:"text",text:question}]})
     });
+    console.log("✅ Mensaje enviado al thread");
 
     // crear run
     const runRes=await fetch(`https://api.openai.com/v1/threads/${currentThreadId}/runs`,{
@@ -193,8 +198,9 @@ async function askAssistant(question){
     });
     const runData=await runRes.json();
     const runId=runData.id;
+    console.log("🚀 Run lanzado:",runId);
 
-    let completed=false;
+    let completed=false, step=0;
     while(!completed){
       const statusRes=await fetch(`https://api.openai.com/v1/threads/${currentThreadId}/runs/${runId}`,{
         headers:{
@@ -203,11 +209,14 @@ async function askAssistant(question){
         }
       });
       const st=await statusRes.json();
+      console.log(`🔍 Estado del run (${step++}):`,st.status);
+
       if(st.status==="completed"){completed=true;}
       else if(st.status==="failed"){appendMessage("⚠️ Error procesando.","bot");return;}
       else{
         statusText.textContent= st.status==="in_progress"?"🤖 Analizando...":"📝 Redactando respuesta...";
-        await new Promise(r=>setTimeout(r,1200));
+        appendMessage("⏳ (Debug) Todavía pensando...","bot");
+        await new Promise(r=>setTimeout(r,1500));
       }
     }
 
@@ -221,8 +230,10 @@ async function askAssistant(question){
     const pollData=await poll.json();
     const msg=pollData.data.find(d=>d.role==="assistant"&&d.content?.length>0);
     if(msg) appendMessage(msg.content[0].text.value,"bot");
+    console.log("📥 Respuesta recibida:",msg?.content[0]?.text?.value);
   }catch(err){
     appendMessage("⚠️ Error al comunicar con IASST","bot");
+    console.error("❌ Error en askAssistant:",err);
   }finally{
     isWaiting=false;
     input.disabled=false; sendBtn.disabled=false;
@@ -251,6 +262,7 @@ document.getElementById("uploadBtn").addEventListener("click",()=>{
   const file=document.getElementById("fileInput").files[0];
   if(!file) return alert("Selecciona un documento primero");
 
+  console.log("📂 Subiendo documento:",file.name);
   const xhr=new XMLHttpRequest();
   const formData=new FormData();
   formData.append("file",file);
@@ -263,16 +275,19 @@ document.getElementById("uploadBtn").addEventListener("click",()=>{
     if(e.lengthComputable){
       const percent=Math.round((e.loaded/e.total)*100);
       progressBar.style.width=percent+"%";
+      statusText.textContent=`📤 Subiendo... ${percent}%`;
     }
   };
 
   xhr.onload=()=>{
     if(xhr.status===200){
       progressBar.style.width="100%";
-      setTimeout(()=>{docControls.style.display="flex";},500);
       appendMessage("✅ Documento subido correctamente","bot");
+      statusText.textContent="📄 Documento listo para consultas.";
+      console.log("✅ Documento subido con éxito");
     }else{
       appendMessage("❌ Error al subir documento","bot");
+      console.error("❌ Error al subir documento:",xhr.responseText);
     }
   };
 
@@ -282,11 +297,11 @@ document.getElementById("uploadBtn").addEventListener("click",()=>{
 // subir más documentos
 document.getElementById("uploadMore").addEventListener("click",()=>{
   progressBar.style.width="0";
-  docControls.style.display="none";
   document.getElementById("fileInput").value="";
+  statusText.textContent="➕ Puedes subir otro documento o preguntar sin subir.";
 });
 
-// preguntar (general, no doc específico)
+// preguntar (sin importar si hay doc)
 document.getElementById("askDocBtn").addEventListener("click",()=>{
   const q=document.getElementById("docQuestion").value.trim();
   if(!q) return;
