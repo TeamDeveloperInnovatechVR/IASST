@@ -50,7 +50,7 @@
     .doc-section{display:flex;gap:10px;align-items:center;}
     .progress-bar{width:100%;height:14px;background:#333;border-radius:7px;overflow:hidden;}
     .progress{height:100%;width:0;background:var(--accent);transition:width 0.3s;}
-    .doc-controls{display:flex;flex-direction:column;gap:10px;} /* habilitado por defecto */
+    .doc-controls{display:flex;flex-direction:column;gap:10px;}
     .doc-controls input{padding:12px;border-radius:10px;border:none;font-size:14px;background:#fff;color:#000;}
     .doc-controls button{background:var(--accent);border:none;color:var(--deep);padding:12px 20px;border-radius:10px;font-weight:bold;cursor:pointer;}
     #statusText{padding:8px;text-align:center;font-size:13px;color:#ccc;}
@@ -116,7 +116,7 @@ const sendBtn=document.getElementById('send');
 const input=document.getElementById('input');
 const statusText=document.getElementById('statusText');
 
-// helper para mensajes en pantalla
+// helper para mensajes en pantalla (solo mensajes reales, no debug)
 function appendMessage(text,type){
   const div=document.createElement('div');
   div.className='msg '+type;
@@ -166,6 +166,32 @@ async function createThread(){
 // ASK ASSISTANT (GENERAL)
 // =========================
 async function askAssistant(question){
+  // helpers locales para animaciones/tiempos
+  function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+  let dotIntervalId = null;
+  function clearDots(){ if(dotIntervalId){ clearInterval(dotIntervalId); dotIntervalId=null; } }
+
+  async function typeStatusText(text, speed=20){
+    // Si el texto actual es exactamente igual, no volver a teclear
+    if(statusText._lastTyped === text) return;
+    clearDots();
+    statusText._lastTyped = text;
+    statusText.textContent = "";
+    for(let i=0;i<=text.length;i++){
+      statusText.textContent = text.slice(0,i);
+      await sleep(speed);
+    }
+  }
+
+  function startDotAnimation(baseText, interval=500){
+    clearDots();
+    let dots = "";
+    dotIntervalId = setInterval(()=>{
+      dots = (dots.length >= 3) ? "" : dots + ".";
+      statusText.textContent = baseText + dots;
+    }, interval);
+  }
+
   try{
     if(!currentThreadId) await createThread();
     isWaiting=true;
@@ -200,7 +226,21 @@ async function askAssistant(question){
     const runId=runData.id;
     console.log("🚀 Run lanzado:",runId);
 
-    let completed=false, step=0;
+    // SECUENCIA DE ESTADOS (se muestran en #statusText, con typing + dots)
+    const loadingSteps=[
+      "📨 Enviando mensaje al asistente",
+      "🤖 IASST recibió tu consulta",
+      "🧠 Procesando solicitud",
+      "📂 Revisando documentos",
+      "📡 Conectando ideas",
+      "✍️ Preparando respuesta"
+    ];
+
+    // variables para controlar la animación y que NO vuelva a reiniciarse desde 0
+    let completed=false;
+    let stageIndex=0;
+    let lastShownStage=-1;
+
     while(!completed){
       const statusRes=await fetch(`https://api.openai.com/v1/threads/${currentThreadId}/runs/${runId}`,{
         headers:{
@@ -209,17 +249,43 @@ async function askAssistant(question){
         }
       });
       const st=await statusRes.json();
-      console.log(`🔍 Estado del run (${step++}):`,st.status);
+      console.log(`🔍 Estado del run (stageIndex=${stageIndex}):`,st.status);
 
-      if(st.status==="completed"){completed=true;}
-      else if(st.status==="failed"){appendMessage("⚠️ Error procesando.","bot");return;}
-      else{
-        statusText.textContent= st.status==="in_progress"?"🤖 Analizando...":"📝 Redactando respuesta...";
-        appendMessage("⏳ (Debug) Todavía pensando...","bot");
-        await new Promise(r=>setTimeout(r,1500));
+      if(st.status==="completed"){
+        completed=true;
+        break;
+      } else if(st.status==="failed"){
+        clearDots();
+        statusText.textContent="⚠️ Error procesando.";
+        appendMessage("⚠️ Error procesando.","bot");
+        return;
+      } else {
+        // si aún hay pasos no mostrados, muéstralos en orden
+        let showStage = (stageIndex < loadingSteps.length) ? stageIndex : loadingSteps.length - 1;
+
+        if(showStage !== lastShownStage){
+          // escribir la nueva etapa (efecto máquina de escribir)
+          await typeStatusText(loadingSteps[showStage]);
+          // iniciar animación de puntos para indicar que continúa
+          startDotAnimation(loadingSteps[showStage]);
+          lastShownStage = showStage;
+        } else {
+          // ya mostramos esta etapa; asegurarnos que haya puntos animando
+          if(!dotIntervalId){
+            startDotAnimation(loadingSteps[showStage]);
+          }
+        }
+
+        // avanzamos el index hasta llegar al último, luego se mantiene ahí (no reinicia)
+        if(stageIndex < loadingSteps.length) stageIndex++;
+
+        // esperar antes del próximo chequeo
+        await sleep(1500);
       }
     }
 
+    // limpiar animaciones y mostrar resultado final
+    clearDots();
     statusText.textContent="✅ Respuesta recibida.";
     const poll=await fetch(`https://api.openai.com/v1/threads/${currentThreadId}/messages`,{
       headers:{
@@ -232,12 +298,16 @@ async function askAssistant(question){
     if(msg) appendMessage(msg.content[0].text.value,"bot");
     console.log("📥 Respuesta recibida:",msg?.content[0]?.text?.value);
   }catch(err){
+    clearDots();
     appendMessage("⚠️ Error al comunicar con IASST","bot");
+    statusText.textContent="❌ Error al comunicar con IASST";
     console.error("❌ Error en askAssistant:",err);
   }finally{
+    clearDots();
     isWaiting=false;
     input.disabled=false; sendBtn.disabled=false;
-    statusText.textContent="💬 Puedes seguir preguntando.";
+    // nota: aquí dejamos el texto de statusText como 'puedes seguir preguntando' si aún no hubo error
+    if(statusText.textContent !== "❌ Error al comunicar con IASST") statusText.textContent="💬 Puedes seguir preguntando.";
   }
 }
 
@@ -288,6 +358,7 @@ document.getElementById("uploadBtn").addEventListener("click",()=>{
     }else{
       appendMessage("❌ Error al subir documento","bot");
       console.error("❌ Error al subir documento:",xhr.responseText);
+      statusText.textContent="❌ Error al subir documento";
     }
   };
 
