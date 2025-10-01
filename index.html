@@ -437,7 +437,7 @@ if(!msgRes.ok){
 PlayAnimation("Thinking", 12, 16, 29);
 
 console.log("✅ Mensaje enviado al thread");
-  const runRes = await fetch(`https://api.openai.com/v1/threads/${currentThreadId}/runs`, {
+const runRes = await fetch(`https://api.openai.com/v1/threads/${currentThreadId}/runs`, {
   method:"POST",
   headers:{
     "Authorization":"Bearer "+API_KEY,
@@ -446,6 +446,15 @@ console.log("✅ Mensaje enviado al thread");
   },
   body: JSON.stringify({ assistant_id: ASSISTANT_ID })
 });
+
+if (!runRes.ok) {
+  const errData = await runRes.json();
+  console.error("❌ Error lanzando run:", errData);
+  appendMessage("⚠️ Error al lanzar la consulta.","bot");
+  statusText.textContent = "❌ No se pudo procesar la pregunta.";
+  return; // 👈 detener aquí para no seguir con runId undefined
+}
+
 const runData = await runRes.json();
 const runId = runData.id;
 console.log("🚀 Run lanzado:", runId, runData);
@@ -555,45 +564,7 @@ toggle.addEventListener('change',()=>{
   else{ chatComposer.style.display="none"; docUploader.style.display="flex";}
 });
 
-// =========================
-// SUBIR DOCUMENTO CON PROGRESO
-// =========================
-document.getElementById("uploadBtn").addEventListener("click",()=>{
-  const file=document.getElementById("fileInput").files[0];
-  if(!file) return alert("Selecciona un documento primero");
 
-  console.log("📂 Subiendo documento:",file.name);
-  const xhr=new XMLHttpRequest();
-  const formData=new FormData();
-  formData.append("file",file);
-  formData.append("purpose","assistants");
-
-  xhr.open("POST","https://api.openai.com/v1/files");
-  xhr.setRequestHeader("Authorization","Bearer "+API_KEY);
-
-  xhr.upload.onprogress=(e)=>{
-    if(e.lengthComputable){
-      const percent=Math.round((e.loaded/e.total)*100);
-      progressBar.style.width=percent+"%";
-      statusText.textContent=`📤 Subiendo... ${percent}%`;
-    }
-  };
-
-  xhr.onload=()=>{
-    if(xhr.status===200){
-      progressBar.style.width="100%";
-      appendMessage("✅ Documento subido correctamente","bot");
-      statusText.textContent="📄 Documento listo para consultas.";
-      console.log("✅ Documento subido con éxito");
-    }else{
-      appendMessage("❌ Error al subir documento","bot");
-      console.error("❌ Error al subir documento:",xhr.responseText);
-      statusText.textContent="❌ Error al subir documento";
-    }
-  };
-
-  xhr.send(formData);
-});
 
 // subir más documentos
 document.getElementById("uploadMore").addEventListener("click",()=>{
@@ -609,6 +580,73 @@ document.getElementById("askDocBtn").addEventListener("click",()=>{
   askAssistant(q);
   document.getElementById("docQuestion").value="";
 });
+
+// =========================
+// SUBIR DOCUMENTO Y VINCULARLO AL ASSISTANT
+// =========================
+const VECTOR_STORE_ID = "vs_12345"; // ⚠️ Reemplázalo por el ID real de tu vector store
+
+document.getElementById("uploadBtn").addEventListener("click", async () => {
+  const file = document.getElementById("fileInput").files[0];
+  if (!file) return alert("Selecciona un documento primero");
+
+  try {
+    console.log("📂 Subiendo documento:", file.name);
+    statusText.textContent = "📤 Subiendo documento...";
+
+    // 1️⃣ Subir archivo
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("purpose", "assistants");
+
+    const uploadRes = await fetch("https://api.openai.com/v1/files", {
+      method: "POST",
+      headers: { "Authorization": "Bearer " + API_KEY },
+      body: formData
+    });
+
+    if (!uploadRes.ok) {
+      throw new Error("❌ Error al subir archivo: " + (await uploadRes.text()));
+    }
+
+    const fileData = await uploadRes.json();
+    console.log("✅ Archivo subido:", fileData);
+    const fileId = fileData.id;
+
+    const VECTOR_STORE_ID = "vs_68c833a4720081919ee584a15e1ccdff"; // 👈 tu ID real entre comillas
+
+ // 2️⃣ Asociar archivo al Vector Store
+const assocRes = await fetch(
+  `https://api.openai.com/v1/vector_stores/${VECTOR_STORE_ID}/files`,
+  {
+    method: "POST",
+    headers: { 
+      "Authorization": "Bearer " + API_KEY,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ file_id: fileId }) // 👈 importante: JSON, no form-urlencoded
+  }
+);
+
+    if (!assocRes.ok) {
+      throw new Error("❌ Error al asociar archivo al vector store: " + (await assocRes.text()));
+    }
+
+    const assocData = await assocRes.json();
+    console.log("✅ Archivo agregado al Vector Store:", assocData);
+
+    // 3️⃣ Feedback visual
+    progressBar.style.width = "100%";
+    appendMessage("✅ Documento subido y agregado al asistente correctamente", "bot");
+    statusText.textContent = "📄 Documento listo para consultas.";
+
+  } catch (err) {
+    console.error(err);
+    appendMessage("❌ Error al procesar el documento", "bot");
+    statusText.textContent = "❌ Error al subir documento";
+  }
+});
+
 
 // =========================
 // START
