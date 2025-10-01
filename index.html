@@ -5,82 +5,125 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Chat con IASST — Ambiente Consultores</title>
   <style>
-    :root {
-      --deep:#1e2146;
-      --accent:#f28a1a;
-      --light:#f5f5f7;
-      --gray:#bbb;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-    body {
-      min-height:100vh;display:flex;align-items:center;justify-content:center;
-      background:linear-gradient(135deg, var(--deep) 0%, #141630 100%);
-      color:#fff;padding:20px;
-    }
-    .app {
-      display:flex;flex-direction:column;width:100%;max-width:1100px;
-      background:rgba(30,33,70,0.97);border-radius:20px;
-      box-shadow:0 12px 40px rgba(0,0,0,0.6);overflow:hidden;
-    }
-
-    /* Header */
-    .header {display:flex;align-items:center;justify-content:space-between;
-      padding:16px 24px;background:rgba(255,255,255,0.05);backdrop-filter:blur(8px);}
-    .header-left{display:flex;align-items:center;gap:14px;}
-    .header-logo{width:46px;height:46px;border-radius:50%;overflow:hidden;background:#fff;}
-    .header-logo img{width:100%;height:100%;object-fit:contain}
-    .header-title{font-size:18px;font-weight:bold;color:var(--accent)}
-    .header-sub{font-size:12px;color:var(--gray)}
-
-    /* Toggle */
-    .toggle-container{display:flex;align-items:center;gap:10px;color:#fff;font-size:13px;}
-    .toggle-container input{width:40px;height:20px;}
-
-    /* Chat layout */
-    .chat-area{
-      flex:1;display:grid;grid-template-columns:300px 1fr;
-      gap:20px;padding:20px;
-    }
-
-    /* Panel izquierda Innovabot */
-    .side-panel{
-      background:rgba(255,255,255,0.05);
-      border-radius:16px;
-      display:flex;flex-direction:column;align-items:center;justify-content:center;
-      padding:20px;
-      text-align:center;
-      box-shadow:0 6px 20px rgba(0,0,0,0.4);
-    }
-    .bot-frame{
-      border:4px solid var(--accent);
-      border-radius:16px;
-      padding:10px;
-      background: radial-gradient(circle at center, rgba(255,255,255,0.05), transparent);
-      width:100%;
-      max-width:240px;
-      aspect-ratio:1/1;
-      display:flex;align-items:center;justify-content:center;
-      overflow:hidden;
-    }
-    .bot-frame img{
-      width:100%;height:100%;object-fit:contain;
-    }
-    .side-panel h3{
-      margin-top:14px;
-      color:var(--accent);
-      font-size:18px;
-      font-weight:bold;
-    }
-    #botImage {
-  width: 100%;
-  height: 100%;
-  object-fit: cover; 
-  background: transparent; /* 👈 evita fondo blanco */
+ :root {
+  --deep:#1e2146;
+  --accent:#f28a1a;
+  --light:#f5f5f7;
+  --gray:#bbb;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-    /* Mensajes */
-    .chat-box{display:flex;flex-direction:column;}
-    .messages{
+body {
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(135deg, var(--deep) 0%, #141630 100%);
+  color:#fff;
+  padding:20px;
+}
+
+.app {
+  display:flex;
+  flex-direction:column;
+  width:100%;
+  max-width:1100px;
+  background:rgba(30,33,70,0.97);
+  border-radius:20px;
+  box-shadow:0 12px 40px rgba(0,0,0,0.6);
+  overflow:hidden;
+}
+
+.header {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap; /* permite que los elementos bajen en pantallas pequeñas */
+  gap:10px;
+  padding:16px 24px;
+}
+
+.header-left {
+  display:flex;
+  align-items:center;
+  gap:12px;
+  flex:1; /* ocupa espacio disponible */
+  min-width:0; /* evita que empuje demasiado */
+}
+
+.header-logo {
+  flex-shrink:0;
+  width:46px;
+  height:46px;
+  border-radius:50%;
+  overflow:hidden;
+  background:#fff;
+}
+.header-logo img {
+  width:100%;
+  height:100%;
+  object-fit:cover; /* mantiene proporción circular */
+  display:block;
+}
+
+/* Textos del header */
+.header-title {
+  font-size:18px;
+  font-weight:bold;
+  color:var(--accent);
+  white-space:nowrap; /* evita que se rompa raro */
+}
+.header-sub {
+  font-size:12px;
+  color:var(--gray);
+}
+
+/* Toggle */
+.toggle-container{display:flex;align-items:center;gap:10px;color:#fff;font-size:13px;}
+.toggle-container input{width:40px;height:20px;}
+
+/* Chat layout */
+.chat-area{
+  flex:1;
+  display:grid;
+  grid-template-columns:300px 1fr;
+  gap:20px;
+  padding:20px;
+}
+
+/* Panel izquierda Innovabot */
+.side-panel{
+  background:rgba(255,255,255,0.05);
+  border-radius:16px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  text-align:center;
+  box-shadow:0 6px 20px rgba(0,0,0,0.4);
+}
+
+.bot-frame{
+  width:100%;
+  max-width:280px;
+  margin:0 auto;
+}
+.bot-frame img{
+  width:100%;
+  height:auto;
+  display:block;
+  object-fit:contain;
+}
+
+/* Chat box */
+.chat-box{
+  display:flex;
+  flex-direction:column;
+  width:100%;
+}
+
+.messages{
   flex:1;
   padding:20px;
   display:flex;
@@ -88,47 +131,79 @@
   gap:12px;
   background:rgba(255,255,255,0.02);
   border-radius:14px;
-
-  /* NUEVO */
-  max-width:700px;
+  max-width:100%;
   max-height:500px;
   overflow-y:auto;
+  box-sizing:border-box;
 }
-    .msg{max-width:75%;padding:12px 16px;border-radius:16px;font-size:14px;line-height:1.4;}
-    .bot{align-self:flex-start;background:rgba(255,255,255,0.1);}
-    .user{align-self:flex-end;background:linear-gradient(135deg,var(--accent),#ffb165);color:var(--deep);font-weight:500;}
 
-    .composer{display:flex;gap:10px;padding:14px;background:rgba(255,255,255,0.05);}
-    .composer input{flex:1;padding:12px;border-radius:10px;border:none;font-size:14px;background:rgba(255,255,255,0.1);color:#fff;}
-    .composer button{background:var(--accent);border:none;color:var(--deep);padding:12px 20px;border-radius:10px;font-weight:bold;cursor:pointer;}
+.msg{max-width:75%;padding:12px 16px;border-radius:16px;font-size:14px;line-height:1.4;}
+.bot{align-self:flex-start;background:rgba(255,255,255,0.1);}
+.user{align-self:flex-end;background:linear-gradient(135deg,var(--accent),#ffb165);color:var(--deep);font-weight:500;}
 
-    /* Documento */
-    .doc-uploader{display:none;flex-direction:column;gap:12px;padding:14px;background:rgba(255,255,255,0.05);}
-    .doc-section{display:flex;gap:10px;align-items:center;}
-    .progress-bar{width:100%;height:14px;background:#333;border-radius:7px;overflow:hidden;}
-    .progress{height:100%;width:0;background:var(--accent);transition:width 0.3s;}
-    .doc-controls{display:flex;flex-direction:column;gap:10px;}
-    .doc-controls input{padding:12px;border-radius:10px;border:none;font-size:14px;background:#fff;color:#000;}
-    .doc-controls button{background:var(--accent);border:none;color:var(--deep);padding:12px 20px;border-radius:10px;font-weight:bold;cursor:pointer;}
-    #statusText{padding:8px;text-align:center;font-size:13px;color:#ccc;}
+/* Composer */
+.composer{
+  display:flex;
+  gap:10px;
+  padding:14px;
+  background:rgba(255,255,255,0.05);
+}
+.composer input{
+  flex:1;
+  padding:12px;
+  border-radius:10px;
+  border:none;
+  font-size:14px;
+  background:rgba(255,255,255,0.1);
+  color:#fff;
+}
+.composer button{
+  background:var(--accent);
+  border:none;
+  color:var(--deep);
+  padding:12px 20px;
+  border-radius:10px;
+  font-weight:bold;
+  cursor:pointer;
+}
 
-    @media(max-width:900px){
+/* Documento */
+.doc-uploader{
+  display:none;
+  flex-direction:column;
+  gap:12px;
+  padding:14px;
+  background:rgba(255,255,255,0.05);
+}
+.doc-section{display:flex;gap:10px;align-items:center;}
+.progress-bar{width:100%;height:14px;background:#333;border-radius:7px;overflow:hidden;}
+.progress{height:100%;width:0;background:var(--accent);transition:width 0.3s;}
+.doc-controls{display:flex;flex-direction:column;gap:10px;}
+.doc-controls input{padding:12px;border-radius:10px;border:none;font-size:14px;background:#fff;color:#000;}
+.doc-controls button{background:var(--accent);border:none;color:var(--deep);padding:12px 20px;border-radius:10px;font-weight:bold;cursor:pointer;}
+#statusText{padding:8px;text-align:center;font-size:13px;color:#ccc;}
+
+/* --- Mobile --- */
+@media(max-width:900px){
   .chat-area{
-    grid-template-columns:1fr;   /* apila en una sola columna */
-    gap: 10px;
+    grid-template-columns:1fr; /* apila Innovabot arriba y chat abajo */
+    gap:15px;
+    padding:10px;
   }
   .side-panel{
-    width: 100%;
-    max-width: 100%; 
-    margin-bottom: 10px;
+    width:100%;
+    max-width:100%;
+    margin:0 auto 10px auto;
   }
   .bot-frame{
-    max-width: 180px; /* el avatar no ocupa toda la pantalla */
-    margin: 0 auto;   /* centrado */
+    max-width:150px; /* Imagen reducida */
+    margin:0 auto;
+  }
+  .chat-box{
+    width:100%;
   }
   .messages{
-    max-width:100%;
-    max-height:300px; 
+    max-height:250px;
     padding:12px;
   }
   .composer{
@@ -140,11 +215,34 @@
     width:100%;
   }
 }
-  .messages{
-    max-width:100%;
-    max-height:300px; /* más reducido en móviles */
+
+/* --- Mobile --- */
+@media(max-width:600px){
+  .header {
+    flex-direction:column;  /* logo arriba, textos abajo */
+    align-items:center;
+    text-align:center;
+  }
+
+  .header-left {
+    flex-direction:column;
+    gap:6px;
+  }
+
+  .header-logo {
+    width:60px;  /* un poco más grande en móvil para mantener calidad */
+    height:60px;
+  }
+
+  .header-title {
+    font-size:16px;
+  }
+
+  .header-sub {
+    font-size:11px;
   }
 }
+
   </style>
 </head>
 <body>
@@ -167,7 +265,7 @@
      <!-- LADO IZQUIERDO Innovabot -->
 <div class="side-panel">
   <div class="bot-frame">
-    <img id="botImage" src="innovabot.png" alt="Innovabot">
+     <img id="botImage" src="Resources/Idle/0001.png" alt="Innovabot"> 
   </div>
   <h3>Innovabot</h3>
   <div id="statusText">🔄 Cargando configuración...</div> <!-- 🔥 MOVIDO AQUÍ -->
@@ -238,7 +336,7 @@ async function loadFirebaseKeys(){
     API_KEY=data.KeyChatGPT;
     ASSISTANT_ID=data.KeyAssit;
     statusText.textContent="✅ Configuración lista. Pregunta lo que quieras.";
-   PlayAnimation("Idle", 12, 1, 90);
+   PlayAnimation("Idle", 12, 1, 22);
     input.disabled=false; sendBtn.disabled=false;
     console.log("⚙️ Configuración cargada:",data);
   }catch(e){
@@ -271,6 +369,7 @@ async function createThread(){
 // =========================
 async function askAssistant(question){
   // helpers locales para animaciones/tiempos
+  if(!currentThreadId) await createThread();
   function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
   let dotIntervalId = null;
   function clearDots(){ if(dotIntervalId){ clearInterval(dotIntervalId); dotIntervalId=null; } }
@@ -286,6 +385,14 @@ async function askAssistant(question){
       await sleep(speed);
     }
   }
+
+  
+// obtener TODOS los archivos antes de enviar mensaje
+const filesRes = await fetch("https://api.openai.com/v1/files", {
+  headers: { "Authorization": "Bearer " + API_KEY }
+});
+const filesData = await filesRes.json();
+const allFileIds = filesData.data.map(f => f.id);
 
   function startDotAnimation(baseText, interval=500){
     clearDots();
@@ -304,31 +411,45 @@ async function askAssistant(question){
     appendMessage(question,'user');
     console.log("📤 Enviando pregunta:",question);
 
-    // enviar mensaje
-    await fetch(`https://api.openai.com/v1/threads/${currentThreadId}/messages`,{
-      method:"POST",
-      headers:{
-        "Authorization":"Bearer "+API_KEY,
-        "Content-Type":"application/json",
-        "OpenAI-Beta":"assistants=v2"
-      },
-      body:JSON.stringify({role:"user",content:[{type:"text",text:question}]})
-    });
-    console.log("✅ Mensaje enviado al thread");
+// enviar mensaje al thread
+const msgRes = await fetch(`https://api.openai.com/v1/threads/${currentThreadId}/messages`, {
+  method:"POST",
+  headers:{
+    "Authorization":"Bearer "+API_KEY,
+    "Content-Type":"application/json",
+    "OpenAI-Beta":"assistants=v2"
+  },
+  body: JSON.stringify({
+    role:"user",
+    content:[{type:"text", text:question}]
+    // ✅ sin attachments, porque los docs ya están vinculados al Assistant
+  })
+});
 
-    // crear run
-    const runRes=await fetch(`https://api.openai.com/v1/threads/${currentThreadId}/runs`,{
-      method:"POST",
-      headers:{
-        "Authorization":"Bearer "+API_KEY,
-        "Content-Type":"application/json",
-        "OpenAI-Beta":"assistants=v2"
-      },
-      body:JSON.stringify({assistant_id:ASSISTANT_ID})
-    });
-    const runData=await runRes.json();
-    const runId=runData.id;
-    console.log("🚀 Run lanzado:",runId);
+// ⚠️ Verificar si hubo error
+if(!msgRes.ok){
+  const errData = await msgRes.json();
+  console.error("❌ Error al enviar mensaje:", errData);
+  appendMessage("⚠️ Error enviando el mensaje.","bot");
+  statusText.textContent = "❌ Error enviando el mensaje";
+  return;
+}
+PlayAnimation("Thinking", 12, 16, 29);
+
+console.log("✅ Mensaje enviado al thread");
+  const runRes = await fetch(`https://api.openai.com/v1/threads/${currentThreadId}/runs`, {
+  method:"POST",
+  headers:{
+    "Authorization":"Bearer "+API_KEY,
+    "Content-Type":"application/json",
+    "OpenAI-Beta":"assistants=v2"
+  },
+  body: JSON.stringify({ assistant_id: ASSISTANT_ID })
+});
+const runData = await runRes.json();
+const runId = runData.id;
+console.log("🚀 Run lanzado:", runId, runData);
+
 
     // SECUENCIA DE ESTADOS (se muestran en #statusText, con typing + dots)
     const loadingSteps=[
@@ -400,7 +521,7 @@ async function askAssistant(question){
     const pollData=await poll.json();
     const msg=pollData.data.find(d=>d.role==="assistant"&&d.content?.length>0);
     if(msg) appendMessage(msg.content[0].text.value,"bot");
-PlayAnimation("Speak", 12, 25, 99);
+PlayAnimation("Speak", 12, 25, 44);
 
     console.log("📥 Respuesta recibida:",msg?.content[0]?.text?.value);
   }catch(err){
@@ -415,8 +536,8 @@ PlayAnimation("Speak", 12, 25, 99);
     // nota: aquí dejamos el texto de statusText como 'puedes seguir preguntando' si aún no hubo error
     if(statusText.textContent !== "❌ Error al comunicar con IASST") statusText.textContent="💬 Puedes seguir preguntando.";
      setTimeout(()=>{
-      PlayAnimation("Idle", 12, 1, 90);
-    }, 2000);
+      PlayAnimation("Idle", 12, 1, 22);
+    }, 5000);
   }
 }
 
