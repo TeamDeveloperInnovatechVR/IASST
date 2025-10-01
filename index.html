@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Chat con IASST — Ambiente Consultores</title>
   <style>
+  #docUploader {
+  display: none; /* inicia oculto */
+}
  :root {
   --deep:#1e2146;
   --accent:#f28a1a;
@@ -38,7 +41,7 @@ body {
   display:flex;
   align-items:center;
   justify-content:space-between;
-  flex-wrap:wrap; /* permite que los elementos bajen en pantallas pequeñas */
+  flex-wrap:wrap;
   gap:10px;
   padding:16px 24px;
 }
@@ -47,8 +50,8 @@ body {
   display:flex;
   align-items:center;
   gap:12px;
-  flex:1; /* ocupa espacio disponible */
-  min-width:0; /* evita que empuje demasiado */
+  flex:1;
+  min-width:0;
 }
 
 .header-logo {
@@ -62,27 +65,21 @@ body {
 .header-logo img {
   width:100%;
   height:100%;
-  object-fit:cover; /* mantiene proporción circular */
+  object-fit:cover;
   display:block;
 }
 
-/* Textos del header */
 .header-title {
   font-size:18px;
   font-weight:bold;
   color:var(--accent);
-  white-space:nowrap; /* evita que se rompa raro */
+  white-space:nowrap;
 }
 .header-sub {
   font-size:12px;
   color:var(--gray);
 }
 
-/* Toggle */
-.toggle-container{display:flex;align-items:center;gap:10px;color:#fff;font-size:13px;}
-.toggle-container input{width:40px;height:20px;}
-
-/* Chat layout */
 .chat-area{
   flex:1;
   display:grid;
@@ -91,14 +88,12 @@ body {
   padding:20px;
 }
 
-/* Panel izquierda Innovabot */
 .side-panel{
   background:rgba(255,255,255,0.05);
   border-radius:16px;
   display:flex;
   flex-direction:column;
   align-items:center;
-  justify-content:center;
   padding:20px;
   text-align:center;
   box-shadow:0 6px 20px rgba(0,0,0,0.4);
@@ -116,7 +111,6 @@ body {
   object-fit:contain;
 }
 
-/* Chat box */
 .chat-box{
   display:flex;
   flex-direction:column;
@@ -141,7 +135,6 @@ body {
 .bot{align-self:flex-start;background:rgba(255,255,255,0.1);}
 .user{align-self:flex-end;background:linear-gradient(135deg,var(--accent),#ffb165);color:var(--deep);font-weight:500;}
 
-/* Composer */
 .composer{
   display:flex;
   gap:10px;
@@ -167,82 +160,61 @@ body {
   cursor:pointer;
 }
 
-/* Documento */
 .doc-uploader{
-  display:none;
+  display:flex;
   flex-direction:column;
   gap:12px;
-  padding:14px;
+  margin-top:15px;
+  width:100%;
   background:rgba(255,255,255,0.05);
+  border-radius:12px;
+  padding:14px;
+  box-shadow:0 3px 10px rgba(0,0,0,0.3);
 }
+
 .doc-section{display:flex;gap:10px;align-items:center;}
 .progress-bar{width:100%;height:14px;background:#333;border-radius:7px;overflow:hidden;}
 .progress{height:100%;width:0;background:var(--accent);transition:width 0.3s;}
 .doc-controls{display:flex;flex-direction:column;gap:10px;}
-.doc-controls input{padding:12px;border-radius:10px;border:none;font-size:14px;background:#fff;color:#000;}
 .doc-controls button{background:var(--accent);border:none;color:var(--deep);padding:12px 20px;border-radius:10px;font-weight:bold;cursor:pointer;}
+
 #statusText{padding:8px;text-align:center;font-size:13px;color:#ccc;}
+
+.side-toggle {
+  margin-top: 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: #fff;
+  background: rgba(255,255,255,0.05);
+  padding: 8px 12px;
+  border-radius: 10px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+}
+
+.side-toggle input {
+  width: 40px;
+  height: 20px;
+}
 
 /* --- Mobile --- */
 @media(max-width:900px){
-  .chat-area{
-    grid-template-columns:1fr; /* apila Innovabot arriba y chat abajo */
-    gap:15px;
-    padding:10px;
-  }
-  .side-panel{
-    width:100%;
-    max-width:100%;
-    margin:0 auto 10px auto;
-  }
-  .bot-frame{
-    max-width:150px; /* Imagen reducida */
-    margin:0 auto;
-  }
-  .chat-box{
-    width:100%;
-  }
-  .messages{
-    max-height:250px;
-    padding:12px;
-  }
-  .composer{
-    flex-direction:column;
-    gap:8px;
-  }
-  .composer input,
-  .composer button{
-    width:100%;
-  }
+  .chat-area{grid-template-columns:1fr;gap:15px;padding:10px;}
+  .side-panel{width:100%;max-width:100%;margin:0 auto 10px auto;}
+  .bot-frame{max-width:150px;margin:0 auto;}
+  .chat-box{width:100%;}
+  .messages{max-height:250px;padding:12px;}
+  .composer{flex-direction:column;gap:8px;}
+  .composer input,.composer button{width:100%;}
 }
-
-/* --- Mobile --- */
 @media(max-width:600px){
-  .header {
-    flex-direction:column;  /* logo arriba, textos abajo */
-    align-items:center;
-    text-align:center;
-  }
-
-  .header-left {
-    flex-direction:column;
-    gap:6px;
-  }
-
-  .header-logo {
-    width:60px;  /* un poco más grande en móvil para mantener calidad */
-    height:60px;
-  }
-
-  .header-title {
-    font-size:16px;
-  }
-
-  .header-sub {
-    font-size:11px;
-  }
+  .header{flex-direction:column;align-items:center;text-align:center;}
+  .header-left{flex-direction:column;gap:6px;}
+  .header-logo{width:60px;height:60px;}
+  .header-title{font-size:16px;}
+  .header-sub{font-size:11px;}
 }
-
   </style>
 </head>
 <body>
@@ -255,53 +227,45 @@ body {
           <div class="header-sub">Asistente virtual de Ambiente Consultores</div>
         </div>
       </div>
-      <div class="toggle-container">
-        <label>Chat Directo</label>
-        <input type="checkbox" id="modeToggle" checked />
-      </div>
     </div>
 
-    <div class="chat-area">
-     <!-- LADO IZQUIERDO Innovabot -->
-<div class="side-panel">
-  <div class="bot-frame">
-     <img id="botImage" src="Resources/Idle/0001.png" alt="Innovabot"> 
+  <div class="chat-area">
+  <!-- LADO IZQUIERDO Innovabot -->
+  <div class="side-panel">
+    <div class="bot-frame">
+       <img id="botImage" src="Resources/Idle/0001.png" alt="Innovabot"> 
+    </div>
+    <h3>Innovabot</h3>
+    <div id="statusText">🔄 Cargando configuración...</div>
+
+    <!-- Toggle -->
+    <div class="side-toggle">
+      <label>CHAT GENERAL</label>
+      <input type="checkbox" id="modeToggle" checked />
+    </div>
+
+    <!-- Uploader -->
+    <div class="doc-uploader" id="docUploader">
+      <input type="file" id="fileInput" />
+      <div class="progress-bar"><div class="progress" id="progress"></div></div>
+      <div class="doc-controls">
+        <button id="uploadBtn">Subir Documento</button>
+      </div>
+    </div>
   </div>
-  <h3>Innovabot</h3>
-  <div id="statusText">🔄 Cargando configuración...</div> <!-- 🔥 MOVIDO AQUÍ -->
+
+  <!-- LADO DERECHO Chat -->
+  <div class="chat-box">
+    <div class="messages" id="messages">
+      <div class="msg bot">👋 Hola, soy IASST. ¿En qué te puedo ayudar hoy?</div>
+    </div>
+    <!-- Input único -->
+    <div class="composer" id="chatComposer">
+      <input id="input" placeholder="Escribe tu mensaje..." />
+      <button id="send" disabled>Enviar</button>
+    </div>
+  </div>
 </div>
-
-      <!-- LADO DERECHO Chat -->
-      <div class="chat-box">
-        <div class="messages" id="messages">
-          <div class="msg bot">👋 Hola, soy IASST. ¿En qué te puedo ayudar hoy?</div>
-        </div>
-
-        <!-- Input normal -->
-        <div class="composer" id="chatComposer">
-          <input id="input" placeholder="Escribe tu mensaje..." disabled />
-          <button id="send" disabled>Enviar</button>
-        </div>
-
-        <!-- Subida de documentos -->
-        <div class="doc-uploader" id="docUploader">
-          <div class="doc-section">
-            <input type="file" id="fileInput" />
-            <button id="uploadBtn">Subir Documento</button>
-          </div>
-          <div class="progress-bar"><div class="progress" id="progress"></div></div>
-
-          <div class="doc-controls" id="docControls">
-            <button id="uploadMore">➕ Subir otro documento</button>
-            <input id="docQuestion" placeholder="Haz una pregunta..." />
-            <button id="askDocBtn">Preguntar</button>
-          </div>
-        </div>
-
-       
-      </div>
-    </div>
-  </div>
 
 <script>
 const FIREBASE_URL="https://iasst-b2ab0-default-rtdb.firebaseio.com/.json";
@@ -333,15 +297,24 @@ async function loadFirebaseKeys(){
   try{
     const res=await fetch(FIREBASE_URL);
     const data=await res.json();
+    console.log("🔥 Datos desde Firebase:", data);
+
     API_KEY=data.KeyChatGPT;
     ASSISTANT_ID=data.KeyAssit;
+
     statusText.textContent="✅ Configuración lista. Pregunta lo que quieras.";
-   PlayAnimation("Idle", 12, 1, 22);
-    input.disabled=false; sendBtn.disabled=false;
-    console.log("⚙️ Configuración cargada:",data);
+    PlayAnimation("Idle", 12, 1, 22);
+
+    // habilitar input
+    input.disabled=false; 
+    sendBtn.disabled=false;
+
   }catch(e){
     statusText.textContent="❌ Error al cargar configuración";
     console.error("❌ Error al cargar Firebase:",e);
+    // 👇 habilitar igual aunque falle Firebase (para pruebas)
+    input.disabled=false; 
+    sendBtn.disabled=false;
   }
 }
 
@@ -551,99 +524,143 @@ PlayAnimation("Speak", 12, 25, 44);
 }
 
 // =========================
-// EVENTOS CHAT
+// EVENTOS CHAT (unificado)
 // =========================
-sendBtn.addEventListener('click',()=>{if(input.value.trim()) askAssistant(input.value.trim()),input.value='';});
-input.addEventListener('keypress',e=>{if(e.key==="Enter"&&!sendBtn.disabled) sendBtn.click();});
+sendBtn.addEventListener('click', () => {
+  const q = input.value.trim();
+  if (!q) return;
 
+  if (toggle.checked) {
+    // ✅ Chat Directo con documentos
+    askAssistant(q);
+  } else {
+    // ❌ Chat normal (sin docs)
+    askChatGPT(q);
+  }
+
+  input.value = "";
+});
+
+input.addEventListener('keypress', e => {
+  if (e.key === "Enter" && !sendBtn.disabled) sendBtn.click();
+});
+
+// 👇 Función alternativa para ChatGPT normal
+async function askChatGPT(question) {
+  appendMessage(question, "user");
+  statusText.textContent = "⏳ Preguntando a ChatGPT...";
+
+  try {
+    const res = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": "Bearer " + API_KEY,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model: "gpt-4o-mini",
+        messages: [{ role: "user", content: question }]
+      })
+    });
+
+    const data = await res.json();
+    const answer = data.choices[0].message.content;
+    appendMessage(answer, "bot");
+    statusText.textContent = "💬 Puedes seguir preguntando.";
+    PlayAnimation("Speak", 12, 25, 44);
+
+  } catch (err) {
+    console.error(err);
+    appendMessage("⚠️ Error al comunicar con ChatGPT", "bot");
+    statusText.textContent = "❌ Error al comunicar con ChatGPT";
+  } finally {
+    setTimeout(() => {
+      PlayAnimation("Idle", 12, 1, 22);
+    }, 5000);
+  }
+}
 // =========================
 // TOGGLE ENTRE MODOS
 // =========================
-toggle.addEventListener('change',()=>{
-  if(toggle.checked){ chatComposer.style.display="flex"; docUploader.style.display="none";}
-  else{ chatComposer.style.display="none"; docUploader.style.display="flex";}
+toggle.addEventListener('change', () => {
+  if (toggle.checked) {
+    // ✅ Modo Chat Directo (solo input, sin uploader)
+    docUploader.style.display = "none";
+  } else {
+    // 📂 Modo Documentos (uploader visible, pero el input sigue activo)
+    docUploader.style.display = "flex";
+  }
 });
 
 
-
-// subir más documentos
-document.getElementById("uploadMore").addEventListener("click",()=>{
-  progressBar.style.width="0";
-  document.getElementById("fileInput").value="";
-  statusText.textContent="➕ Puedes subir otro documento o preguntar sin subir.";
-});
-
-// preguntar (sin importar si hay doc)
-document.getElementById("askDocBtn").addEventListener("click",()=>{
-  const q=document.getElementById("docQuestion").value.trim();
-  if(!q) return;
-  askAssistant(q);
-  document.getElementById("docQuestion").value="";
-});
 
 // =========================
 // SUBIR DOCUMENTO Y VINCULARLO AL ASSISTANT
 // =========================
-const VECTOR_STORE_ID = "vs_12345"; // ⚠️ Reemplázalo por el ID real de tu vector store
+const VECTOR_STORE_ID = "vs_68c833a4720081919ee584a15e1ccdff"; // ⚠️ Reemplázalo por el ID real de tu vector store
 
-document.getElementById("uploadBtn").addEventListener("click", async () => {
-  const file = document.getElementById("fileInput").files[0];
-  if (!file) return alert("Selecciona un documento primero");
+document.addEventListener("DOMContentLoaded", () => {
+  const uploadBtn = document.getElementById("uploadBtn");
+  const fileInput = document.getElementById("fileInput");
 
-  try {
-    console.log("📂 Subiendo documento:", file.name);
-    statusText.textContent = "📤 Subiendo documento...";
+  if (uploadBtn) {
+    uploadBtn.addEventListener("click", async () => {
+      const file = fileInput.files[0];
+      if (!file) return alert("Selecciona un documento primero");
 
-    // 1️⃣ Subir archivo
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("purpose", "assistants");
+      try {
+        console.log("📂 Subiendo documento:", file.name);
+        statusText.textContent = "📤 Subiendo documento...";
 
-    const uploadRes = await fetch("https://api.openai.com/v1/files", {
-      method: "POST",
-      headers: { "Authorization": "Bearer " + API_KEY },
-      body: formData
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("purpose", "assistants");
+
+        const uploadRes = await fetch("https://api.openai.com/v1/files", {
+          method: "POST",
+          headers: { "Authorization": "Bearer " + API_KEY },
+          body: formData
+        });
+
+        if (!uploadRes.ok) {
+          throw new Error("❌ Error al subir archivo: " + (await uploadRes.text()));
+        }
+
+        const fileData = await uploadRes.json();
+        console.log("✅ Archivo subido:", fileData);
+        const fileId = fileData.id;
+
+        const assocRes = await fetch(
+          `https://api.openai.com/v1/vector_stores/${VECTOR_STORE_ID}/files`,
+          {
+            method: "POST",
+            headers: { 
+              "Authorization": "Bearer " + API_KEY,
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ file_id: fileId })
+          }
+        );
+
+        if (!assocRes.ok) {
+          throw new Error("❌ Error al asociar archivo al vector store: " + (await assocRes.text()));
+        }
+
+        const assocData = await assocRes.json();
+        console.log("✅ Archivo agregado al Vector Store:", assocData);
+
+        progressBar.style.width = "100%";
+        appendMessage("✅ Documento subido y agregado al asistente correctamente", "bot");
+        statusText.textContent = "📄 Documento listo para consultas.";
+
+      } catch (err) {
+        console.error(err);
+        appendMessage("❌ Error al procesar el documento", "bot");
+        statusText.textContent = "❌ Error al subir documento";
+      }
     });
-
-    if (!uploadRes.ok) {
-      throw new Error("❌ Error al subir archivo: " + (await uploadRes.text()));
-    }
-
-    const fileData = await uploadRes.json();
-    console.log("✅ Archivo subido:", fileData);
-    const fileId = fileData.id;
-
-    const VECTOR_STORE_ID = "vs_68c833a4720081919ee584a15e1ccdff"; // 👈 tu ID real entre comillas
-
- // 2️⃣ Asociar archivo al Vector Store
-const assocRes = await fetch(
-  `https://api.openai.com/v1/vector_stores/${VECTOR_STORE_ID}/files`,
-  {
-    method: "POST",
-    headers: { 
-      "Authorization": "Bearer " + API_KEY,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ file_id: fileId }) // 👈 importante: JSON, no form-urlencoded
-  }
-);
-
-    if (!assocRes.ok) {
-      throw new Error("❌ Error al asociar archivo al vector store: " + (await assocRes.text()));
-    }
-
-    const assocData = await assocRes.json();
-    console.log("✅ Archivo agregado al Vector Store:", assocData);
-
-    // 3️⃣ Feedback visual
-    progressBar.style.width = "100%";
-    appendMessage("✅ Documento subido y agregado al asistente correctamente", "bot");
-    statusText.textContent = "📄 Documento listo para consultas.";
-
-  } catch (err) {
-    console.error(err);
-    appendMessage("❌ Error al procesar el documento", "bot");
-    statusText.textContent = "❌ Error al subir documento";
+  } else {
+    console.error("⚠️ No se encontró el botón con id='uploadBtn'");
   }
 });
 
